@@ -1,0 +1,572 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class SlotMachine extends JFrame {
+
+    int betCred = 0;
+    int cred = 10;
+    int wins = 0;
+    int loses = 0;
+    double avgbet = 0.0;
+    boolean spining = false;
+
+//buttons and labels in the first section
+    JFrame frame1 = new JFrame("Spin and Win");
+    JFrame statframe = new JFrame("Statistics");
+    JPanel panel = new JPanel();
+    JPanel imgPan = new JPanel();
+    JLabel labWel = new JLabel("Welcome to Spin and Win !!");
+    JLabel labPress = new JLabel("Press Button to Start");
+    JButton butStart = new JButton("START");
+
+    Font font = new Font(Font.DIALOG, Font.PLAIN, 32);
+    Font font1 = new Font(Font.SANS_SERIF, Font.BOLD, 24);
+
+//buttons and labels in the 2nd section
+    JLabel labCred = new JLabel("Credits : "+cred);
+    JLabel labBet = new JLabel("Amount Bet : "+betCred);
+    JButton butSpin = new JButton ("SPIN");
+    JButton butAdd = new JButton ("Add Coin");
+    JButton butOne = new JButton ("Bet One");
+    JButton butMax = new JButton ("Bet Max");
+    JButton butReset = new JButton ("Reset");
+    JButton butStat = new JButton ("Statistics");
+    JLabel labResult = new JLabel();
+    JButton butSave = new JButton("Save");
+
+//all image JLabels
+    JLabel img1 = new JLabel();
+    JLabel img2 = new JLabel();
+    JLabel img3 = new JLabel();
+    JLabel imgReel1 = new JLabel();
+    JLabel imgReel2 = new JLabel();
+    JLabel imgReel3 = new JLabel();
+    JLabel imgReel4 = new JLabel();
+
+    GridBagConstraints gbc = new GridBagConstraints();
+    Symbol sy = new Symbol();
+  //  Reel rl = new Reel();
+
+    public static void main(String[]args){
+        SlotMachine sm = new SlotMachine();
+        sm.frame1.setLocationRelativeTo(null);
+        sm.launch();
+
+    }
+
+    void launch(){
+
+        labWel.setSize(1100, 1500);
+        panel.setLayout(new GridBagLayout());
+        panel.setBackground(Color.CYAN);
+        panel.setSize(500,500);
+
+        gbc.ipady = 1;
+        gbc.ipadx = 1;
+
+        gbc.fill = GridBagConstraints.CENTER;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
+        labWel.setFont(font);
+        panel.add(labWel, gbc);
+
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(labPress, gbc);
+
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        butStart.setSize(0,1);
+        panel.add(butStart, gbc);
+
+        frame1.add(panel);
+        frame1.setSize(700, 600);
+        frame1.setLocationRelativeTo(null);
+        frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame1.setVisible(true);
+
+        butStart.addActionListener(start);
+        butOne.addActionListener(one);
+        butMax.addActionListener(max);
+        butAdd.addActionListener(coin);
+        butReset.addActionListener(reset);
+        butStat.addActionListener(stat);
+        butSpin.addActionListener(spin);
+    }
+
+    void start(){
+
+        butStart.setVisible(false);
+        panel.remove(butStart);
+        panel.remove(labPress);
+
+        cred = 10;
+        betCred = 0;
+        labCred.setText("Credits : "+cred);
+        labBet.setText("Amount Bet : "+betCred);            //resetting the credit variables and lables
+
+        gbc.fill = GridBagConstraints.HORIZONTAL;           //gridbag layout object
+
+        gbc.gridx = 0;      //assinging x axis
+        gbc.gridy = 3;      //assinging y axis
+        panel.add(labCred, gbc);        //adding to layout
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        panel.add(labBet, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        panel.add(butAdd, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        panel.add(butOne, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        panel.add(butMax, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        panel.add(butReset, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 9;
+        butStat.setSize(3,3);
+        panel.add(butStat, gbc);
+
+        imgPan.setLayout(new FlowLayout());         //setting layout
+        imgPan.setBackground(Color.WHITE);
+        imgPan.setSize(170,500);                    //setting size to panel
+
+        imgReel1.setIcon(new ImageIcon("src/reel.png"));            //adding reel to panel
+        imgReel2.setIcon(new ImageIcon("src/reel.png"));
+        imgReel3.setIcon(new ImageIcon("src/reel.png"));
+        imgReel4.setIcon(new ImageIcon("src/reel.png"));
+        imgPan.add(imgReel1);
+
+        gbc.gridx = 0;
+        gbc.gridy = 10;
+        img1.setIcon(new ImageIcon(sy.getImage(0)));
+        //img1.setIcon(new ImageIcon(sy.strip[0].icon));
+        imgPan.add(img1);
+        imgPan.add(imgReel2);
+
+
+        // gbc.gridx = 2;
+        img2.setIcon(new ImageIcon(sy.getImage(1)));
+        imgPan.add(img2);
+        imgPan.add(imgReel3);
+
+
+
+        //gbc.gridx = 3;
+        img3.setIcon(new ImageIcon(sy.getImage(2)));
+        imgPan.add(img3);
+        imgPan.add(imgReel4);
+
+        panel.add(imgPan,gbc);
+
+
+
+        gbc.gridx = 0;              //setting spin button
+        gbc.gridy = 11;
+        butSpin.setBackground(Color.RED);
+        butSpin.setFont(font1);
+        panel.add(butSpin, gbc);
+        butSpin.setVisible(false);
+
+        gbc.gridx = 0;              //setting result label
+        gbc.gridy = 12;
+        labResult.setVisible(false);
+        labResult.setFont(font1);
+        panel.add(labResult, gbc);
+
+    }
+
+    void addCoin(){
+        cred++;
+        labCred.setText("Credits : "+cred);
+    }
+
+    void one(){
+        if((betCred<3)&&(cred>0)) {
+            betCred++;
+            cred--;
+            avgbet++;           //incrementing average bet
+            labBet.setText("Amount Bet : " + betCred);
+            labCred.setText("Credit : " +cred);
+            butSpin.setVisible(true);
+        }
+        //butSpin.addActionListener(spin);
+    }
+
+    void max(){
+        if(cred>=3) {
+            cred = cred - (3 - betCred);
+            betCred = 3;
+            avgbet = avgbet+3;          //adding to avg bet
+            labBet.setText("Amount Bet : " + betCred);
+            labCred.setText("Credit : " + cred);
+            butSpin.setVisible(true);
+        }
+    }
+
+    void reset(){
+        cred = cred + betCred;                   //adding bet amount back to credits
+        betCred = 0;                            //reducing bet credit to 0
+        avgbet = avgbet - betCred;              //reducing avgbet
+        labBet.setText("Amount Bet : "+betCred);
+        labCred.setText("Credits : "+cred);
+        labResult.setVisible(false);            //making result lable invisible
+        butSpin.setVisible(false);              //making spin button invisible
+    }
+
+    void statistics(){
+
+        statframe.setSize(300, 200);
+        statframe.setLocationRelativeTo(null);
+       // statframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        statframe.setVisible(true);
+
+        JPanel statpanel = new JPanel();
+        statframe.add(statpanel);
+        statpanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        butSave.setBackground(Color.red);
+
+        avgbet = avgbet/(wins+loses);           //computing avg bet amount
+
+        JLabel labwins = new JLabel("Wins : "+wins);
+        JLabel labloss = new JLabel("Loses : "+loses);
+        JLabel labavg = new JLabel("Average Bet : "+avgbet);
+
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        statpanel.add(labwins,gbc);
+        gbc.gridy = 1;
+        gbc.gridx = 0;
+        statpanel.add(labloss,gbc);
+        gbc.gridy = 2;
+        gbc.gridx = 0;
+        statpanel.add(labavg,gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        statpanel.add(butSave,gbc);
+
+        butSave.addActionListener(save);
+
+    }
+
+    void spin(){
+               if (spining == true) {
+                    spining = false;
+                   butSpin.setBackground(Color.RED);
+                   stop();
+                } else {
+                    spining = true;
+                }
+
+        Random rand = new Random();
+        Symbol sy = new Symbol();
+        Reel ry = new Reel();
+
+                Reel reel1 = new Reel() {
+                    public void run() {
+                        int[]role;
+                        role = ry.getReel();
+                      while (spining == true) {
+                          for (int i = 0; i < 6; i++) {
+                              if (spining == true) {
+                             //     int y1 = rand.nextInt(5);
+                                  img1.setIcon(new ImageIcon(sy.getImage(role[i])));
+                                  try {
+                                      Thread.sleep(200);
+                                  } catch (InterruptedException e) {
+                                      System.out.println("Interrupted Exception");
+                                  }
+                              }
+                              if(i>=5){
+                                  i=0;
+                              }
+                          }
+                      }
+                    }
+                };
+
+        Reel reel2 = new Reel() {
+            public void run() {
+                int[]role;
+                role = ry.getReel();
+                while (spining == true) {
+                    for (int i = 0; i < 6; i++) {
+                        if (spining == true) {
+                            //     int y1 = rand.nextInt(5);
+                            img2.setIcon(new ImageIcon(sy.getImage(role[i])));
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                System.out.println("Interrupted Exception");
+                            }
+                        }
+                        if(i>=5){
+                            i=0;
+                        }
+                    }
+                }
+            }
+        };
+
+        Reel reel3 = new Reel() {
+            public void run() {
+                int[]role;
+                role = ry.getReel();
+                while (spining == true) {
+                    for (int i = 0; i < 6; i++) {
+                        if (spining == true) {
+                            //     int y1 = rand.nextInt(5);
+                            img3.setIcon(new ImageIcon(sy.getImage(role[i])));
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                System.out.println("Interrupted Exception");
+                            }
+                        }
+                        if(i>=5){
+                            i=0;
+                        }
+                    }
+                }
+            }
+        };
+
+        reel1.start();
+        reel2.start();
+        reel3.start();
+
+            }
+
+    void stop()  {
+
+            Random rand = new Random();
+            Symbol sy = new Symbol();
+
+            int y1 = rand.nextInt(5);
+            img1.setIcon(new ImageIcon(sy.getImage(y1)));
+
+            int y2 = rand.nextInt(5);
+            img2.setIcon(new ImageIcon(sy.getImage(y2)));
+
+            int y3 = rand.nextInt(5);
+            img3.setIcon(new ImageIcon(sy.getImage(y3)));
+
+        if ((y1 == y2)&&(y2 == y3)){
+            wins++;
+            labResult.setText("YOU WIN !!");
+            labResult.setVisible(true);
+            cred = cred - betCred + (betCred*(y1+2));
+            labCred.setText("Credits : "+cred);
+            betCred = 0;
+            labBet.setText("Amount Bet : "+betCred);
+            System.out.println(y1);
+                butSpin.setVisible(false);              //forcing player to bet
+        }
+
+        else if ((y1 == y2)||(y2 == y3)||(y1 == y3)){
+            labResult.setText("TRY AGAIN !!");
+            labResult.setVisible(true);
+            System.out.println(y1+" "+y2+" "+y3);
+          //  cred = cred - betCred + (betCred*y1);
+          //  labCred.setText("Credits : "+cred);
+        }
+
+        else {
+            loses++;
+            labResult.setText("YOU LOSE!!");
+            labResult.setVisible(true);
+            labCred.setText("Credits : "+cred);
+            betCred = 0;
+            labBet.setText("Amount Bet : "+betCred);
+            System.out.println(y1+" "+y2+" "+y3);
+                butSpin.setVisible(false);              //forcing player to bet
+
+                if((cred<=0)){
+                    panel.remove(labCred);
+                    panel.remove(labBet);
+                    panel.remove(butAdd);
+                    panel.remove(butOne);
+                    panel.remove(butMax);
+                    panel.remove(butReset);
+                    panel.remove(labCred);
+                    panel.remove(butSpin);
+                    labResult.setText("GAME OVER !!");
+                  //  imgPan.disable();
+                        gbc.gridx = 0;
+                        gbc.gridy = 13;
+                    butStart.setText("Restart");
+                    butStart.setVisible(true);
+                    panel.add(butStart,gbc);
+
+                }
+        }
+
+    }
+
+    void save(){
+        BufferedWriter bw = null;
+        FileWriter fw = null;
+
+        try {
+            fw = new FileWriter("src/stat.txt");
+
+        bw = new BufferedWriter(fw);
+        bw.write("Wins : "+wins+" \n");
+            bw.write(System.getProperty("line.separator"));
+        bw.write("Loses : "+loses+" \n");
+        bw.write("Average Bet Amount : "+avgbet+" \n");
+
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Input Output Exception");
+        }
+
+        butSave.setText("SAVED");           //confirmation
+        butSave.setBackground(Color.GREEN);
+    }
+
+    ActionListener start = new ActionListener() {
+        public void actionPerformed(ActionEvent actionEvent) {
+            start();
+        }
+
+    };
+    ActionListener coin = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            addCoin();
+        }
+    };
+    ActionListener one = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            one();
+        }
+    };
+    ActionListener max = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            max();
+        }
+    };
+    ActionListener reset = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            reset();
+        }
+    };
+    ActionListener stat = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            statistics();
+        }
+    };
+    ActionListener spin = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            butSpin.setBackground(Color.GREEN);
+            spin();
+        }
+    };
+    ActionListener save = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            save();
+        }
+    };
+    
+    import java.util.*;
+
+public class Reel extends Thread {
+    Random rand = new Random();
+
+    int[] getReel(){
+        int[]strip = new int[6];
+        strip[0]=rand.nextInt(5);
+        strip[1]=rand.nextInt(5);
+        strip[2]=rand.nextInt(5);
+        strip[3]=rand.nextInt(5);
+        strip[4]=rand.nextInt(5);
+        strip[5]=rand.nextInt(5);
+        return strip;
+    }
+
+
+
+}
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class Symbol implements ISymbol {
+    String icon;
+    int index;
+
+    Symbol[]strip = new Symbol[6];
+
+
+    public void setIcon(String icon){
+
+         this.icon = icon;
+    }
+
+    public void setIndex(int index) {
+
+        this.index = index;
+    }
+
+    public String getImage(int index){
+
+        String link = null;
+
+        if( index == 0){
+            link = "src/cherry.png";
+        }
+        if( index == 1){
+            link = "src/lemon.png";
+        }
+        if( index == 2){
+            link = "src/plum.png";
+        }
+        if( index == 3){
+            link = "src/watermelon.png";
+        }
+        if( index == 4){
+            link = "src/bell.png";
+        }
+        if( index == 5){
+            link = "src/redseven.png";
+        }
+        return link;
+    }
+
+
+}
+public interface ISymbol {
+      void setIcon(String icon);
+        void setIndex(int index);
+      String getImage(int index);
+}
