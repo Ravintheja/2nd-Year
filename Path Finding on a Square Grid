@@ -1,0 +1,401 @@
+import java.util.Scanner;
+import java.util.*;
+//import org.apache.commons.lang.time.StopWatch;
+
+/*************************************************************************
+ *  Author: Dr E Kapetanios
+ *  Last update: 22-02-2017
+ *
+ *************************************************************************/
+
+public class PathFindingOnSquaredGrid2 {
+
+    // given an N-by-N matrix of open cells, return an N-by-N matrix
+    // of cells reachable from the top
+    public static boolean[][] flow(boolean[][] open) {
+        int N = open.length;
+    
+        boolean[][] full = new boolean[N][N];
+        for (int j = 0; j < N; j++) {
+            flow(open, full, 0, j);
+        }
+    	
+        return full;
+    }
+    
+    // determine set of open/blocked cells using depth first search
+    public static void flow(boolean[][] open, boolean[][] full, int i, int j) {
+        int N = open.length;
+
+        // base cases
+        if (i < 0 || i >= N) return;    // invalid row
+        if (j < 0 || j >= N) return;    // invalid column
+        if (!open[i][j]) return;        // not an open cell
+        if (full[i][j]) return;         // already marked as open
+
+        full[i][j] = true;
+
+        flow(open, full, i+1, j);   // down
+        flow(open, full, i, j+1);   // right
+        flow(open, full, i, j-1);   // left
+        flow(open, full, i-1, j);   // up
+    }
+
+    // does the system percolate?
+    public static boolean percolates(boolean[][] open) {
+        int N = open.length;
+    	
+        boolean[][] full = flow(open);
+        for (int j = 0; j < N; j++) {
+            if (full[N-1][j]) return true;
+        }
+    	
+        return false;
+    }
+    
+ // does the system percolate vertically in a direct way?
+    public static boolean percolatesDirect(boolean[][] open) {
+        int N = open.length;
+    	
+        boolean[][] full = flow(open);
+        int directPerc = 0;
+        for (int j = 0; j < N; j++) {
+        	if (full[N-1][j]) {
+        		// StdOut.println("Hello");
+        		directPerc = 1;
+        		int rowabove = N-2;
+        		for (int i = rowabove; i >= 0; i--) {
+        			if (full[i][j]) {
+        				// StdOut.println("i: " + i + " j: " + j + " " + full[i][j]);
+        				directPerc++;
+        			}
+        			else break;
+        		}
+        	}
+        }
+    	
+        // StdOut.println("Direct Percolation is: " + directPerc);
+        if (directPerc == N) return true; 
+        else return false;
+    }
+    
+    // draw the N-by-N boolean matrix to standard draw
+    public static void show(boolean[][] a, boolean which) {
+        int N = a.length;
+        StdDraw.setXscale(-1, N);;
+        StdDraw.setYscale(-1, N);
+        StdDraw.setPenColor(StdDraw.BLACK);
+        for (int i = 0; i < N; i++)
+            for (int j = 0; j < N; j++)
+                if (a[i][j] == which)
+                	StdDraw.square(j, N-i-1, .5);
+                else StdDraw.filledSquare(j, N-i-1, .5);
+    }
+
+    // draw the N-by-N boolean matrix to standard draw, including the points A (x1, y1) and B (x2,y2) to be marked by a circle
+    public static void show(boolean[][] a, boolean which, int x1, int y1, int x2, int y2) {
+        int N = a.length;
+        StdDraw.setXscale(-1, N);;
+        StdDraw.setYscale(-1, N);
+        StdDraw.setPenColor(StdDraw.BLACK);
+        
+        for (int i = 0; i < N; i++)
+            for (int j = 0; j < N; j++)
+                if (a[i][j] == which)
+                	if ((i == x1 && j == y1) ||(i == x2 && j == y2)) {
+                		StdDraw.circle(j, N-i-1, .5);
+                	}
+                	else StdDraw.square(j, N-i-1, .5);
+                else StdDraw.filledSquare(j, N-i-1, .5);
+    }
+    
+    // return a random N-by-N boolean matrix, where each entry is
+    // true with probability p
+    public static boolean[][] random(int N, double p) {
+        boolean[][] a = new boolean[N][N];
+        for (int i = 0; i < N; i++)
+            for (int j = 0; j < N; j++)
+                a[i][j] = StdRandom.bernoulli(p);
+        return a;
+    }
+    
+
+    // test client
+    public static void main(String[] args) {
+        // boolean[][] open = StdArrayIO.readBoolean2D();
+    	
+    	// The following will generate a 10x10 squared grid with relatively few obstacles in it
+    	// The lower the second parameter, the more obstacles (black cells) are generated
+    	boolean[][] randomlyGenMatrix = random(10, 0.6);
+    	
+    	StdArrayIO.print(randomlyGenMatrix);
+    	show(randomlyGenMatrix, true);
+    	
+    	System.out.println();
+    	System.out.println("The system percolates: " + percolates(randomlyGenMatrix));
+    	
+    	System.out.println();
+    	System.out.println("The system percolates directly: " + percolatesDirect(randomlyGenMatrix));
+    	System.out.println();
+    	
+    	// Reading the coordinates for points A and B on the input squared grid.
+    	
+    	// THIS IS AN EXAMPLE ONLY ON HOW TO USE THE JAVA INTERNAL WATCH
+    	// Start the clock ticking in order to capture the time being spent on inputting the coordinates
+    	// You should position this command accordingly in order to perform the algorithmic analysis
+    	
+    	
+    	Scanner in = new Scanner(System.in);
+        System.out.println("Enter i for A > ");
+        int Ai = in.nextInt();
+        
+        System.out.println("Enter j for A > ");
+        int Aj = in.nextInt();
+        
+        System.out.println("Enter i for B > ");
+        int Bi = in.nextInt();
+        
+        System.out.println("Enter j for B > ");
+        int Bj = in.nextInt();
+        
+     // THIS IS AN EXAMPLE ONLY ON HOW TO USE THE JAVA INTERNAL WATCH
+        // Stop the clock ticking in order to capture the time being spent on inputting the coordinates
+    	// You should position this command accordingly in order to perform the algorithmic analysis
+       
+        
+        // System.out.println("Coordinates for A: [" + Ai + "," + Aj + "]");
+        // System.out.println("Coordinates for B: [" + Bi + "," + Bj + "]");
+        
+        show(randomlyGenMatrix, true, Ai, Aj, Bi, Bj);
+        
+        PathFindingOnSquaredGrid2 path = new PathFindingOnSquaredGrid2 ();
+        path.find(randomlyGenMatrix, Ai, Aj, Bi, Bj);
+       //test();
+      
+    }
+    
+  public void find (boolean[][] matrix, int si, int sj, int ei, int ej){
+  //  StopWatch stopWatch = new StopWatch();
+    Stopwatch timerFlow = new Stopwatch();
+    Node start;
+    Node end;
+    Node[][] grid;
+    int size = matrix.length;
+    
+     // Horizontal and VerticalDistance Cost
+    double sDist = 1.0; 
+    // Diagonal Distance Cost
+    double dDist = 1.4; 
+    
+       start = new Node(si, sj);
+       end = new Node(ei, ej);
+       
+       // The grid that is used to store nodes
+       grid = new Node[size][size];
+       
+       for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size; ++j) {
+                grid[i][j] = new Node(i, j);
+                if (matrix[i][j] == false) {
+                    grid[i][j].obstacle = true;
+                }
+            }
+        }
+       
+     Comparator<Node> adjacencyComparator = (left, right) -> {
+            if (left.distance > (right.distance)) {
+                return 1;
+            }
+            return -1;
+        };
+       
+       start.distance =0;
+       
+       Queue<Node> vque = new PriorityQueue(size, adjacencyComparator );
+
+       vque.add(start);
+
+       while (vque.size() > 0) {
+            Node current = vque.remove();
+            Node t;
+
+            // Top
+            if (current.x - 1 >= 0) {
+                t = grid[current.x - 1][current.y];
+                if (!t.checked && !t.obstacle && t.distance > current.distance + sDist) {
+                    t.distance = current.distance + sDist;
+                    t.parent = current;
+                    vque.add(t);
+                    
+                }
+
+                // Top Left
+                if (current.y - 1 > 0) {
+                    t = grid[current.x - 1][current.y - 1];
+                    if (!t.checked && !t.obstacle && t.distance > current.distance + dDist) {
+                        t.distance = current.distance + dDist;
+                        t.parent = current;
+                        vque.add(t);
+                       
+                    }
+                }
+
+                // Top Right
+                if (current.y + 1 < size) {
+                    t = grid[current.x - 1][current.y + 1];
+                    if (!t.checked && !t.obstacle && t.distance > current.distance + dDist) {
+                        t.distance = current.distance + dDist;
+                        t.parent = current;
+                        vque.add(t);
+                       
+                    }
+                }
+            }
+
+            // Left
+            if (current.y - 1 > 0) {
+                t = grid[current.x][current.y - 1];
+                if (!t.checked && !t.obstacle && t.distance > current.distance + sDist) {
+                    t.distance = current.distance + sDist;
+                    t.parent = current;
+                    vque.add(t);
+                    
+                }
+            }
+
+            // Right
+            if (current.y + 1 < size) {
+                t = grid[current.x][current.y + 1];
+                if (!t.checked && !t.obstacle && t.distance > current.distance + sDist) {
+                    t.distance = current.distance + sDist;
+                    t.parent = current;
+                    vque.add(t);
+                   
+                }
+            }
+            // Down
+            if (current.x + 1 < size) {
+
+                // Down Down
+                t = grid[current.x + 1][current.y];
+                if (!t.checked && !t.obstacle && t.distance > current.distance + sDist) {
+                    t.distance = current.distance + sDist;
+                    t.parent = current;
+                    vque.add(t);
+                   
+                }
+
+                // Down Left
+                if (current.y - 1 >= 0) {
+                    t = grid[current.x + 1][current.y - 1];
+                    if (!t.checked && !t.obstacle && t.distance > current.distance + dDist) {
+                        t.distance = current.distance + dDist;
+                        t.parent = current;
+                        vque.add(t);
+                       
+                    }
+                }
+
+                // Down Right
+                if (current.y + 1 < size) {
+                    t = grid[current.x + 1][current.y + 1];
+                    if (!t.checked && !t.obstacle && t.distance > current.distance + dDist) {
+                        t.distance = current.distance + dDist;
+                        t.parent = current;
+                        vque.add(t);
+                        
+                    }
+                }
+            }
+            current.checked = true;
+        }
+
+       // ArrayList<Node> path = new ArrayList<>();
+          ArrayList<Integer> pathy = new ArrayList<Integer>();
+          ArrayList<Integer> pathx = new ArrayList<Integer>();
+
+
+        // Checking if a path exists
+        if (!(grid[end.x][end.y].distance == Integer.MAX_VALUE)) {
+            //Trace back the path
+            Node current = grid[end.x][end.y];
+
+            while (current.parent != null) {
+            //    path.add(current.parent);
+            pathy.add(current.y);
+            pathx.add(current.x);
+                current = current.parent;
+               // System.out.println(pathy);
+              //  System.out.println(pathx);
+              //  System.out.println(current.x+" - "+current.y);
+                counter(current.x, current.y, ei, ej);  //to count movements
+                print(current.x,current.y); //to join the two nodes on grid
+            }
+            //  System.out.println(str+" - "+diag);
+              System.out.println("Manhattan Distance : "+(str+(diag*2)));
+              System.out.println("Chebyshev Distance : "+(str+(diag*1.4)));
+              System.out.println("Euclidean Distance : "+Math.sqrt(((si-ei)*(si-ei))+((sj-ej)*(sj-ej))));   // root((x1-x2)^2+(y1-y2)^2)
+
+        } else System.out.println("No possible path");
+
+       System.out.println("Time Elapsed : "+timerFlow.elapsedTime()+"s");
+    }
+  
+        void print(int x, int y){       //to print path.
+            StdDraw.setPenColor(StdDraw.ORANGE);
+           // StdDraw.setPenRadius(0.001);
+            StdDraw.filledCircle(y, 9-x, .4);
+            }
+        
+        int count = 0;
+        int str = 0;
+        int diag = 0;
+        int prevx = 0;
+        int prevy = 0;
+        
+        void counter (int x, int y, int endx, int endy){
+           
+            
+            if(count == 0){ //setting intial pre value
+                prevx = x;
+                prevy = y;
+                if((endx != x)&&(endy != y)){ //testing change in value
+                    diag++;     //incrementing diagonal movement count
+                 //   System.out.println("D");
+                }
+                if((endx == x)||(endy == y)){ //testing change in value
+                    str++;      //incrementing straight movement count
+                   // System.out.println("S");
+                }
+                count++;
+                
+            }
+            else{
+                if((prevx != x)&&(prevy != y)){ //testing change in value
+                    diag++;     //incrementing diagonal movement count
+                   // System.out.println("D");
+                }
+                if((prevx == x)||(prevy == y)){ //testing change in value
+                    str++;      //incrementing straight movement count
+                  //  System.out.println("S");
+                }
+                prevx = x; //setting new pre value
+                prevy = y;
+            }
+        }
+        
+  }
+  
+  class Node {
+        int x;
+        int y;
+        double distance = Integer.MAX_VALUE;
+        Node parent = null;
+        boolean checked;
+        boolean obstacle;
+
+        public Node(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
