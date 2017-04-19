@@ -1,0 +1,371 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class WestministerCarParkManager implements CarParkManager{
+	
+	Scanner sc = new Scanner(System.in);	//enabling scanner
+	
+	ArrayList<Vehicle> Veh = new ArrayList<Vehicle>();	//intiating Array List to store objects
+	
+	String[] Pslot = new String[20];	//initiating array for Parking Slot
+	
+	DateAndTime dt = new DateAndTime();
+	
+	Car car1 = new Car();		//creating car object
+	
+	Van van1 = new Van();		//creating van object
+	
+	MotorBike bike1 = new MotorBike();		//creating Motor Bike object
+	
+//	WestministerCarParkManager wcpm = new WestministerCarParkManager();
+	
+	public static void main (String[]args){
+		
+		System.out.println("Welcome to Westminister Car Park Manager !!");
+		
+		WestministerCarParkManager wcpm = new WestministerCarParkManager();
+				//creating an object of the Westminister Car Park Manager
+	//	wcpm.time();
+		wcpm.Menu();
+	}
+	
+	
+	
+	 	public void Menu(){
+		
+		System.out.println("Please select fuction by entering the designated character");
+		System.out.println("Enter (A) to Add, (D) to Delete, (V) to View, (S) to Search. \n");
+		char action = sc.next().charAt(0);
+		
+			if (action=='a'||action=='A'){
+				Add();
+			}
+			if (action=='d'||action=='D'){
+				Delete();
+			}
+			if (action=='V'||action=='v'){
+				View();
+			}
+			if (action=='S'||action=='s'){
+				Search();
+			}
+			if (action=='T'||action=='t'){
+				Stat();
+			}
+			
+			else {
+				System.out.println("Invalid Entry !! \n");
+				Menu();
+			}
+		}
+		
+		public void Add(){
+			System.out.println("Enter 'C' for car, 'V' for van and 'B' for motorbike.\nPress M to return. \n");
+			char vehicle = sc.next().charAt(0);
+			
+			switch(vehicle){
+			case 'C' :
+				
+				Car car = new Car();
+				System.out.println("You chose Car. \n");
+				for(int x = 0; x<20; x++){
+					if(Pslot[x]==null){
+						
+						System.out.println("Enter Vehicle Number");
+						String id = sc.nextLine();
+							id = sc.nextLine();
+						System.out.println("Enter Brand");
+							String brand = sc.nextLine();
+						System.out.println("Enter Car Color");
+							String color = sc.nextLine();
+						System.out.println("Enter Number of Doors");
+							int doorNumb = sc.nextInt();
+						String time = dt.getDateandTime();
+						
+						car.setId(id);
+						car.setBrand(brand);
+						car.setEntry(time);
+						car1.setDoor(doorNumb);
+						car1.setColor(color);
+						Veh.add(car);
+						Pslot[x]=car.id;
+						
+						System.out.println("Vehicle was successfully added.");
+						Menu();
+					}
+					
+				}
+				System.out.println("All Parking Slots are Unavailable");
+				Menu();
+				
+				break;
+				
+				
+			case 'V' :
+				Van van = new Van();
+				System.out.println("You chose Van. \n");
+				for(int x = 0; x<19; x++){
+					if(Pslot[x]==null && Pslot[x+1]==null){
+						
+						System.out.println("Enter Vehicle Number");
+						String id = sc.nextLine();
+							id = sc.nextLine();
+						System.out.println("Enter Brand");
+							String brand = sc.nextLine();
+						System.out.println("Enter the Cargo Volume");
+							int cargVol = sc.nextInt();
+						String time = dt.getDateandTime();
+						
+						van.setId(id);
+						van.setBrand(brand);
+						van1.setCargVol(cargVol);
+						van.setEntry(time);
+						Veh.add(van);
+						Pslot[x]=van.id;
+						Pslot[x+1]=van.id;
+						System.out.println("Vehicle was successfully added.");
+						Menu();
+					}
+					
+				}
+				System.out.println("All Parking Slots are Unavailable");
+				Menu();
+				
+				break;
+			
+			case 'B' :
+				MotorBike bike = new MotorBike();
+				System.out.println("You chose Motor Bike. \n");
+				for(int x = 0; x<20; x++){
+					if(Pslot[x]==null){
+						
+						System.out.println("Enter Vehicle Number");
+						String id = sc.nextLine();
+							id = sc.nextLine();
+						System.out.println("Enter Brand");
+							String brand = sc.nextLine();
+						System.out.println("Enter Engine Size");
+							int engine = sc.nextInt();
+						String time = dt.getDateandTime();
+						
+						bike.setId(id);
+						bike.setBrand(brand);
+						bike1.setEngineSize(engine);
+						bike.setEntry(time);
+						Veh.add(bike);
+						Pslot[x]=bike.id;
+						System.out.println("Vehicle was successfully added.");
+						Menu();
+					}
+					
+				}
+				System.out.println("All Parking Slots are Unavailable");
+				Menu();
+				
+				break;
+				
+			case 'M' :
+				Menu();
+				break;
+			
+			default :
+				System.out.println("Invalid Entry");
+				Add();
+			}
+			
+		}
+		
+		public void Delete(){
+			System.out.println("Enter Vehicle ID");
+			String id = sc.nextLine();
+				id = sc.nextLine();
+			String type = "Car";
+								for(int y =0; y<Veh.size(); y++){			//to find vehicle type
+									if(Veh.get(y).id==id ){
+										if(Veh.get(y).getClass()== Car.class){
+											type = "Car";
+										}
+										else if(Veh.get(y).getClass()== Van.class){
+											type = "Van";
+										}
+										else if(Veh.get(y).getClass()== MotorBike.class){
+											type = "Motor Bike";
+										}
+									}
+								}
+				for(int x = 0; x<20; x++){
+					if(Pslot[x].equals(id)){
+						System.out.println("Vehicle Type - "+type);
+						System.out.println("Vehicle ID - "+id);
+						System.out.println("Exit Time "+dt.getDateandTime());
+						Pslot[x]=null;
+						System.out.println("**Vehicle Removed** \n");
+						int charge = getAmount(id);
+						System.out.println("Parking Charge = "+charge);
+						Menu();
+					}
+					else{
+						System.out.println("Vehicle Not Found. \n");
+						break;
+					}
+				}
+				Menu();
+		}
+		
+		public void View(){
+			int z;
+			int n=0;
+			int y = Veh.size();
+			for(int x = 0; x<y; x++){			//to find the respective object
+				if(Pslot[x]!= null){
+				for(z=0; z<y; z++){
+					if(Veh.get(z).id==Pslot[x]){			//comparing id of object and parking slot
+						n = z;
+					}
+				}
+					System.out.println("***Parking Slot Number "+(x+1)+" - "+Pslot[x]+"\n");
+					System.out.println("Vehicle Type - "+Veh.get(n).getClass());
+					System.out.println("Vehicle ID - "+Veh.get(n).id);
+					System.out.println("Brand - "+Veh.get(n).brand);
+					
+						if(Veh.get(n).getClass()==  Car.class){
+							System.out.println("Number of Doors - "+car1.doorNumb);
+							System.out.println("Color - "+car1.color);
+						}
+						
+						if(Veh.get(n).getClass()==  Van.class){
+							System.out.println("Cargo Volume - "+van1.cargVol);
+						}
+						
+						if(Veh.get(n).getClass()==  MotorBike.class){
+							System.out.println("Engine Size - "+bike1.engineSize);
+						}					
+						
+					System.out.println("Entry Time - "+Veh.get(x).entryDetail+"\n");
+				}
+				}
+			Menu();
+			}
+		
+		public void Search(){
+			System.out.println("Enter ID");
+			String id = sc.next();
+			//id = sc.nextLine();
+			for(int x=0; x<Veh.size();x++){
+				
+				if(Veh.get(x).id.equals(id)){
+					System.out.println("***Parking Slot Number "+(x+1)+" - "+Pslot[x]+"\n");
+					System.out.println("Vehicle Type - "+Veh.get(x).getClass());
+					System.out.println("Vehicle ID - "+Veh.get(x).id);
+					System.out.println("Brand - "+Veh.get(x).brand);
+					
+						if(Veh.get(x).getClass()==  Car.class){
+							System.out.println("Number of Doors - "+car1.doorNumb);
+							System.out.println("Color - "+car1.color);
+						}
+						
+						if(Veh.get(x).getClass()==  Van.class){
+							System.out.println("Cargo Volume - "+van1.cargVol);
+						}
+						
+						if(Veh.get(x).getClass()==  MotorBike.class){
+							System.out.println("Engine Size - "+bike1.engineSize);
+						}					
+						
+					System.out.println("Entry Time - "+Veh.get(x).entryDetail+"\n");
+					Menu();
+				}
+				
+					
+				}
+			System.out.println("Not Found \n");
+				Menu();
+			}
+		
+		public void Stat(){
+			System.out.println("Press P for percentage of vehicles.");
+			System.out.println("Press L for Longest and Last Parked.");
+			System.out.println("Press D for Vehicles Parked on Day.");
+			System.out.println("Press M for to return to Menu. \n");
+			
+			char stat = sc.next().charAt(0);
+			
+			switch(stat){
+			case 'P':
+				long countcar=0;
+				long countvan=0;
+				long countbike=0;
+				
+				for(int x=0; x<20; x++){
+					for(int y=0; y<Veh.size(); y++){			//finding the matching vehicles
+						if(Pslot[x]==Veh.get(y).id){
+							if(Veh.get(y).getClass()==  Car.class){
+								countcar++;			//increasing car count
+							}
+							if(Veh.get(y).getClass()==  Van.class){
+								countvan++;			//increasing van count
+							}
+							if(Veh.get(y).getClass()==  MotorBike.class){
+								countbike++;		//increasing bike count
+							}
+						}
+					}
+					
+				}
+				long countTotal = countcar+countvan+countbike;	//finidng total count of vehicals
+				System.out.println("Percentage of Car = "+(countcar/countTotal*100)+"% \n");
+				System.out.println("Percentage of Van = "+(countvan/countTotal*100)+"% \n");
+				System.out.println("Percentage of Bike = "+(countbike/countTotal*100)+"% \n");
+				Stat();
+				break;
+			
+			case 'L':
+				System.out.println("Last Parked Vehicle");
+					System.out.println("Vehicle ID - "+Veh.get(Veh.size()-1).id);
+					System.out.println("Vehicle Type - "+Veh.get(Veh.size()-1).getClass());
+					System.out.println("Vehicle Brand - "+Veh.get(Veh.size()-1).brand);
+					System.out.println("Entry Time - "+Veh.get(Veh.size()-1).entryDetail+"\n");
+					
+				System.out.println("Longest Parked Vehicle");
+					for(int x = 0; x<Veh.size()-1; x++){
+						if(Pslot[x]==Veh.get(x).id){
+							System.out.println("Vehicle ID - "+Veh.get(x).id);
+							System.out.println("Vehicle Type - "+Veh.get(x).getClass());
+							System.out.println("Vehicle Brand - "+Veh.get(x).brand);
+							System.out.println("Entry Time - "+Veh.get(x).entryDetail+"\n");
+							Stat();
+						}
+					}
+					
+				break;
+				
+			default :
+				System.out.println("Invalid Entry !! \n");
+				Stat();
+			}
+			
+			
+		}
+
+		public int getAmount(String id){
+			
+			return 0;
+		}
+		
+		public void time(){
+			System.out.println("Enter Year :");
+			int year = sc.nextInt();
+			System.out.println("Enter Month :");
+			int month = sc.nextInt();
+			System.out.println("Enter Day :");
+			int day = sc.nextInt();
+			System.out.println("Enter Hours :");
+			int hours = sc.nextInt();
+			System.out.println("Enter Minutes :");
+			int mins = sc.nextInt();
+			System.out.println("Enter Seconds :");
+			int sec = sc.nextInt();
+			
+			dt.setTime(year, month, day, hours, mins, sec);
+		}
+}
