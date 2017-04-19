@@ -1,0 +1,209 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class HotelSystem {
+	String[] Rooms = {"Empty","Empty","Empty","Empty","Empty","Empty","Empty","Empty","Empty","Empty"};
+	Scanner sc = new Scanner(System.in);
+	//String[]Rooms=new String[10];
+	
+	
+	public static void main(String[]args){
+		
+		System.out.println("Welcome to Hotel Management System '16 \n");
+		HotelSystem veet = new HotelSystem();
+		veet.Menu();
+		//Menu();
+	}
+	
+	
+	void Menu() {
+		System.out.println("Please Enter the Designated Character to enable function.");
+		System.out.println("Enter A to Add Customer");
+		System.out.println("Enter V to View Customers");
+		System.out.println("Enter E to to Display Empty Rooms");
+		System.out.println("Enter D to Delete Customer");
+		System.out.println("Enter F to Find Customer");
+		System.out.println("Enter S to List");
+		System.out.println("Enter L to Load");
+		System.out.println("Enter O to View Alphebetically \n");
+		Scanner sc = new Scanner(System.in);
+		char call = sc.next().charAt(0);
+		
+		if (call=='V'||call=='v'){
+			ViewRooms();
+		}
+		if (call=='A'||call=='a'){
+			Add();
+		}
+		if (call=='E'||call=='e'){
+			DisplayEmpty();
+		}
+		if (call=='D'||call=='d'){
+			Delete();
+		}
+		if (call=='F'||call=='f'){
+			Find();
+		}
+		if (call=='S'||call=='s'){
+			Save();
+		}
+		if (call=='L'||call=='l'){
+			Load();
+		}
+		if (call=='O'||call=='o'){
+			Order();
+		}
+		/*if (call=='T'){			//A method just for indivitual function testing
+			Test();
+		}*/
+		else {
+			System.out.println("Invalid Entry");
+			Menu();
+		}
+	}
+	
+	void ViewRooms() {
+		for(int x=0; x<10; x++){
+		System.out.println("Room "+(x+1)+" - "+Rooms[x]);
+		}
+		Menu();
+	}
+	
+	void Add() {
+		try{
+		int Rnumb;
+		do{
+		System.out.println("Enter Room Number");
+		Rnumb = sc.nextInt();
+		
+			if((Rnumb<1)||(Rnumb>10)){
+				System.out.println("Invalid Room Number");
+			}
+	}while((Rnumb<1)||(Rnumb>10));
+		--Rnumb;
+		System.out.println("Enter Customer Name");
+		String name = sc.nextLine();
+		name = sc.nextLine();
+		Rooms[Rnumb] = name;
+		++Rnumb;
+		System.out.println("Customer added to Room No:"+Rnumb+"\n");
+		}catch(InputMismatchException exception){
+			System.out.println("Enter a number !!");
+		}
+/*		--Rnumb;
+				System.out.println(Rooms[Rnumb]+" ");*/		
+		Menu();
+}	
+	
+	
+	void DisplayEmpty(){
+		for(int x = 0;x<=9;x++){
+			if(Rooms[x]=="Empty"){
+				System.out.println("Room "+(x+1)+" is empty.");
+			}
+		}
+		Menu();
+	}
+	
+	void Delete(){
+		System.out.println("Enter Room Number to Delete Customer.");
+		try{
+		int Rnumb = sc.nextInt();
+		--Rnumb;
+		Rooms[Rnumb]="Empty";
+		System.out.println("Customer Deleted \n");
+		}catch(InputMismatchException exception){
+			System.out.println("Enter a number !!");
+		}
+		Menu();
+	}
+	
+	void Find (){
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Enter Name of Customer to find Room.");
+		boolean found=false;
+		String name = sc.nextLine();
+		int x;
+		int foundroom = 0;
+		for(x = 0;x<10;x++){
+			if(Rooms[x].matches(name)){
+				found=true;
+				foundroom=x;
+
+			}
+
+		}
+			if(found==true){
+				System.out.println("Customer found in Room "+(foundroom+1));
+			}
+			else{
+				System.out.println("Customer not found \n");
+			}
+		Menu();
+	}
+	
+	void Save (){
+		File file = new File("Room_List.txt");
+		PrintWriter prw = null;
+		FileWriter fw = null; //the auto flush
+		try {
+			fw = new FileWriter(file);//true /*to open the code in append mode*/);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		prw = new PrintWriter(fw,true);		//opening the file to write to the file
+		
+		for(int x=0; x<10; x++){
+			prw.println("Room : "+(x+1));
+			prw.println(Rooms[x]);
+		}
+		
+		prw.println("End");
+		prw.flush();
+		prw.close();
+		System.out.println("File Saved");
+		Menu();
+	}
+	
+	void Load(){
+		File file = new File("Room_List.txt");
+		try {
+			sc = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			System.out.println("File not Found");// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for(int x=0; x<10; x++){
+			Rooms[x]=sc.nextLine();
+			Rooms[x]=sc.nextLine();
+		}
+		System.out.println("File Loaded");
+		Menu();
+	}
+	
+	void Order(){
+		for(char letter='A';letter<='Z';letter++){
+			String character = String.valueOf(letter);
+			for(int x=0;x<10;x++){
+				if(Rooms[x].startsWith(character)){
+					System.out.println(Rooms[x]+" - Room "+(x+1));
+				}
+			}
+		}
+		Menu();
+	}
+	
+	/*void Test(){
+		for(int x=0;x<10;x++){
+			if(Rooms[x].startsWith("R")){
+				System.out.println(Rooms[x]+" - Room "+(x+1));
+			}
+		}
+	}*/
+}
